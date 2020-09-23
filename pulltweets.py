@@ -10,6 +10,8 @@ import os, sys
 from threading import Thread
 from twython import TwythonStreamer
 
+assert len(sys.argv) == 2, 'Usage: run pulltweets.py *Your Search Term*'
+
 class globalVars():
   pass
 
@@ -59,12 +61,14 @@ def pull_tweets():
 tweetpuller = Thread(target=pull_tweets)
 tweetpuller.start()
 
-help = 'h | help : get help\ns | status : get collection status\nq | quit : quit and save csv\nc | cancel : quit without saving\n'
+help = 'h | help : get help\nq | quit : quit and save csv\nc | cancel : quit without saving\n'
+
+
 
 def get_cmd(): 
   cmd = input()
   if cmd == 'h' or cmd == 'help':
-    print(cmd)#print(help)
+    print(help)
     return 1
   elif cmd == 'q' or cmd == 'quit':
     G.kill = True
