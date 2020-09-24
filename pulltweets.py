@@ -15,6 +15,7 @@ assert len(sys.argv) == 2, 'Usage: run pulltweets.py *Your Search Term*'
 class globalVars():
   pass
 
+#holds the state of the additional thread
 G = globalVars()
 G.kill = False
 
