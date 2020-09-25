@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 import pandas as pd
 import glob
 import ast
@@ -11,7 +13,7 @@ get a list of unique users given a csv of tweets
 '''
 
 print('Loading Tweets...')
-df = pd.read_csv('./tables/ncu1k.csv')
+df = pd.read_csv('./tables/ncu1k.csv', usecols=['user'])
 
 #get unique userids
 print('Collecting Users...')
