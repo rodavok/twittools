@@ -34,15 +34,18 @@ twython = Twython(
                   OAUTH_TOKEN_SECRET
                   )
 
-hydrated_users = {}
+friends_users = {}
 
 #requests limited to 15/15mins
 with Bar(f'Collecting Friends for {len(users)} users... ', max=len(users), suffix='%(eta)d%%') as bar:
 	for user in users:
-		hydrated_users[user] = twython.get_friends_ids(params={user})
+		friends_users[user] = twython.get_friends_ids(params={user})
 		time.sleep(61)
 		bar.next()
 
-df = pd.DataFrame.from_dict(hydrated_users)
+
+#keys are used as column names by default, I probably want to switch but the cursor stuff is confusing me 
+#IF i want to use the keys as rows, use option orient='index')
+df = pd.DataFrame.from_dict(friends_users)
 
 df.to_csv('./tables/tweetersfriends.csv')
