@@ -3,7 +3,7 @@
 import pandas as pd
 import glob
 import ast
-#import time
+import time
 import os, sys
 from twython import Twython
 from tqdm import tqdm
