@@ -6,10 +6,13 @@ import ast
 import time
 import os, sys
 from twython import Twython
-from progress.bar import Bar
+from tqdm import tqdm
 
 '''
 get a list of unique users given a csv of tweets
+TODO: 
+get rate limits directly from twitter
+take topic as an argument instead of hardcoding, & save as topic-specific-file with timestamp so as to avoid overwriting (ever)
 '''
 
 print('Loading Tweets...')
@@ -34,18 +37,14 @@ twython = Twython(
                   OAUTH_TOKEN_SECRET
                   )
 
-friends_users = {}
+user_friends = {}
 
 #requests limited to 15/15mins
-with Bar(f'Collecting Friends for {len(users)} users... ', max=len(users), suffix='%(eta)d%%') as bar:
-	for user in users:
-		friends_users[user] = twython.get_friends_ids(params={user})
-		time.sleep(61)
-		bar.next()
+print(f'Collecting Friends for {len(users)} users... ')
+for user in tqdm(users):
+	user_friends[user] = twython.get_friends_ids(params={user})
+	time.sleep(61)
 
+df = pd.DataFrame.from_dict(users_friends, orient='index')
 
-#keys are used as column names by default, I probably want to switch but the cursor stuff is confusing me 
-#IF i want to use the keys as rows, use option orient='index')
-df = pd.DataFrame.from_dict(friends_users)
-
-df.to_csv('./tables/tweetersfriends.csv')
+df.to_csv('./tables/ncu1kfriends.csv')
