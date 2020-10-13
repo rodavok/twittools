@@ -36,15 +36,20 @@ twython = Twython(
 
 user_tweets = {}
 
-#requests limited to 60/min, how to handle?
-#Can ask twitter what the limits are at
-twython.get_application_rate_limit_status(params={'statuses/user_timeline'})
+#timeline requests limited to 60/min, how to handle?
+#Can ask twitter what the limits are at - It returns json as a dict, navigate to remaining 
+twython.get_application_rate_limit_status()['resources']['statuses']['/statuses/user_timeline']['remaining']
+#BUT these are rate limited as well - 12/min
 
 print(f'Collecting timelines for {len(users)} users... ')
 for user in tqdm(users):
-	print(twython.get_application_rate_limit_status(params={'statuses/user_timeline'}))
-	user_tweets[user] = twython.get_user_timeline(params={user})
+	try:
+		#why is it only returning my tweets? i think the error lies with how I supply user
+		user_tweets[user] = twython.get_user_timeline(user_id=user)
+	except:
+		#you *can* check how many you have left, but you have even less of that kind of request
+		break
 
-df = pd.DataFrame.from_dict(user_tweets, orient='index')
+df = pd.DataFrame.from_dict(user_tweets), orient='index')
 
 df.to_csv('./tables/ncu1k_timelines.csv')
