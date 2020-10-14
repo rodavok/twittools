@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import pandas as pd
-import glob
 import ast
 import time
-import os, sys
+import os
 from twython import Twython
 from tqdm import tqdm
 
@@ -36,20 +35,29 @@ twython = Twython(
 
 user_tweets = {}
 
-#timeline requests limited to 60/min, how to handle?
-#Can ask twitter what the limits are at - It returns json as a dict, navigate to remaining 
-twython.get_application_rate_limit_status()['resources']['statuses']['/statuses/user_timeline']['remaining']
-#BUT these are rate limited as well - 12/min
+#check number of remaining requests 
+starting_requests = requests_remaining = int(twython.get_application_rate_limit_status()['resources']['statuses']['/statuses/user_timeline']['remaining'])
+
+print(f'{requests_remaining} requests remaining')
 
 print(f'Collecting timelines for {len(users)} users... ')
-for user in tqdm(users):
-	try:
-		#why is it only returning my tweets? i think the error lies with how I supply user
-		user_tweets[user] = twython.get_user_timeline(user_id=user)
-	except:
-		#you *can* check how many you have left, but you have even less of that kind of request
-		break
 
-df = pd.DataFrame.from_dict(user_tweets), orient='index')
+for user in tqdm(users):
+	if requests_remaining > 0:
+		try:
+			user_tweets[user] = twython.get_user_timeline(user_id=user)
+		except:
+			pass
+		if requests_remaining >= starting_requests:
+			#start timer if this was the first request
+			end_time = time.time() + 15*60 + 10
+		requests_remaining -= 1
+	else:
+		#wait until window rolls over
+		while time.time() < end_time:
+			time.sleep(15)
+		starting_requests = requests_remaining = int(twython.get_application_rate_limit_status()['resources']['statuses']['/statuses/user_timeline']['remaining'])
+
+df = pd.DataFrame.from_dict(user_tweets, orient='index')
 
 df.to_csv('./tables/ncu1k_timelines.csv')
