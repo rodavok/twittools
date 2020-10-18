@@ -40,9 +40,6 @@ starting_requests = requests_remaining = int(twython.get_application_rate_limit_
 
 print(f'{requests_remaining} requests remaining')
 
-#truncated list of users for testing purposes
-users = list(users)[:4]
-
 users_tweets = {}
 
 print(f'Collecting timelines for {len(users)} users... ')
