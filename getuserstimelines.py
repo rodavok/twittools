@@ -72,7 +72,7 @@ for user in tqdm(users):
 			while time.time() < end_time:
 				time.sleep(15)
 			#reset request count
-			starting_requests = requests_remaining = int(twython.get_application_rate_limit_status()['resources']['statuses']['/statuses/user_timeline']['remaining'])
+			starting_requests = requests_remaining = 899 #int(twython.get_application_rate_limit_status()['resources']['statuses']['/statuses/user_timeline']['remaining'])
 
 		if len(timeline_chunk) > 0:
 			user_tweets += timeline_chunk
