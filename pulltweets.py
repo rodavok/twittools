@@ -15,6 +15,11 @@ assert len(sys.argv) == 2, 'Usage: run pulltweets.py *Your Search Term*'
 class globalVars():
   pass
 
+#save to new dataset, or append to existing one
+filepath = f'./tables/policy.csv'
+tweets = []
+tot = 0
+
 #holds the state of the additional thread
 G = globalVars()
 G.kill = False
@@ -23,7 +28,14 @@ class MyStreamer(TwythonStreamer):
     def on_success(self, data):
         if data.get('lang') == 'en':
             tweets.append(data)
-            print(f'received tweet #{len(tweets)}')
+            #save progress every n tweets
+            if len(tweets > 4000):
+              tweets_df = pd.DataFrame(tweets)
+              print(f'Appending to {filepath}...')
+              tweets_df.to_csv(filepath, mode='a', index=False, header=False)
+              tot + = len(tweets)
+              tweets = []
+            print(f'received tweet #{tot}')
             
         if G.kill:
           print('Tweet collection stopped')
@@ -42,9 +54,6 @@ APP_KEY = os.environ.get('APP_KEY')
 APP_SECRET = os.environ.get('APP_SECRET')
 OAUTH_TOKEN = os.environ.get('OAUTH_TOKEN')
 OAUTH_TOKEN_SECRET = os.environ.get('OAUTH_TOKEN_SECRET')
-    
-
-tweets = []
 
 #Start streamer instance
 stream = MyStreamer(
@@ -88,9 +97,6 @@ while get_cmd():
   pass
     
 tweets_df = pd.DataFrame(tweets)
-
-#save to new dataset, or append to existing one
-filepath = f'./tables/{topic}.csv'
 
 if os.path.isfile(filepath):
   print(f'Appending to {filepath}...')
