@@ -7,8 +7,10 @@ Created on Thu Jul  2 21:42:51 2020
 #import json  datetime
 import pandas as pd
 import os, sys
+import json
 from threading import Thread
 from twython import TwythonStreamer
+
 
 assert len(sys.argv) == 2, 'Usage: run pulltweets.py *Your Search Term*'
 
@@ -46,7 +48,7 @@ OAUTH_TOKEN = os.environ.get('OAUTH_TOKEN')
 OAUTH_TOKEN_SECRET = os.environ.get('OAUTH_TOKEN_SECRET')
 
 tweets = []
-filepath = f'./tables/policy.csv'
+filepath = f'./tables/policy.json'
 
 
 #Start streamer instance
@@ -90,12 +92,6 @@ print(f'Collecting tweets about {topic}!\n{help}')
 while get_cmd():
   pass
     
-tweets_df = pd.DataFrame(tweets)
-
-if os.path.isfile(filepath):
-  print(f'Appending to {filepath}...')
-  tweets_df.to_csv(filepath, mode='a', index=False, header=False)
-  print(f'Appended to {filepath}! Exiting...')
-else:
-  tweets_df.to_csv(filepath, index=False)
-  print(f'Saved to {filepath}! Exiting...')
+print(f'Saving to {filepath}!')
+with open(filepath, 'w') as json_file:
+  json.dump(tweets, json_file, allow_nan=False, indent=4)
